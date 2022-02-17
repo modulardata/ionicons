@@ -278,11 +278,10 @@ def eotname(ttf):
     i = ttf.rfind('.')
     if i != -1:
         ttf = ttf[:i]
-    return ttf + '.eotlite'
+    return f'{ttf}.eotlite'
 
 def readfont(f):
-    data = open(f, 'rb').read()
-    return data
+    return open(f, 'rb').read()
 
 def get_table_directory(data):
     """read the SFNT header and table directory"""
@@ -347,7 +346,7 @@ def make_eot_name_headers(fontdata, nameTableDir):
     name = get_name_records(fontdata[nameoffset : nameoffset + namelen])
     namestroffset = name['strOffset']
     namerecs = name['namerecords']
-    
+
     eotnames = (OpenType.NAME_ID_FAMILY, OpenType.NAME_ID_STYLE, OpenType.NAME_ID_VERSION, OpenType.NAME_ID_FULL)
     nameheaders = []
     for nameid in eotnames:
@@ -358,11 +357,11 @@ def make_eot_name_headers(fontdata, nameTableDir):
             nformat = '%dH' % (nlen / 2)		# length is in number of bytes
             start = nameoffset + namestroffset + noffset
             end = start + nlen
-            nstr = struct.unpack('>' + nformat, fontdata[start:end])
-            nameheaders.append(struct.pack('<H' + nformat + '2x', nlen, *nstr))
+            nstr = struct.unpack(f'>{nformat}', fontdata[start:end])
+            nameheaders.append(struct.pack(f'<H{nformat}2x', nlen, *nstr))
         else:
             nameheaders.append(struct.pack('4x'))  # len = 0, padding = 0
-    
+
     return ''.join(nameheaders)
 
 # just return a null-string (len = 0)
